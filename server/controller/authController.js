@@ -44,17 +44,27 @@ export const register = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // cookie valid for 7 days
     });
 
-    // send email to user for verification
     const mailOptions = {
       from: process.env.SENDER_EMAIL,
       to: email,
-      subject: "send email using nodejs",
-      text: `hello this is test email ${email}`,
+      subject: "📧 Email Verification - Complete Your Registration",
+      text: `Hello ${email},
+
+        Thank you for registering with us! 🎉  
+
+        To complete your account setup and verify your email address, please click the verification link we’ve sent to you.  
+        If you don’t verify your email, you may not be able to access all the features of your account.  
+
+        If you didn’t request this registration, you can safely ignore this email.  
+
+        Best regards,  
+        The Support Team`,
     };
 
+    
     // Use your transporter to send the email
     await transporter.sendMail(mailOptions);
-    
+
     // Step 6: Send success response back to client
     res.json({ success: true, message: "User registered successfully" });
   } catch (error) {
