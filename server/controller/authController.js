@@ -47,7 +47,7 @@ export const register = async (req, res) => {
     res.json({ success: true, message: "User registered successfully" });
   } catch (error) {
     // If any error occurs, send it back in response
-    res.json({ success: false, message: error.message });
+   return res.json({ success: false, message: error.message });
   }
 };
 
@@ -100,6 +100,21 @@ export const login = async (req, res) => {
     return res.json({ success: true });
   } catch (error) {
     // On any error, respond with a generic server error message
-    res.json({ success: false, message: "server error" });
+   return res.json({ success: false, message: "server error" });
+  }
+};
+
+// Controller function for user logOut
+export const logOut = async (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true, // Prevents client-side JS from reading the cookie (mitigates XSS)
+      secure: process.env.NODE_ENV === "production", // Send cookie only over HTTPS in production
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", // cross-site cookie behavior
+      maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie lifespan: 7 days (in milliseconds)
+    });
+    return res.json({ success: true, message: "user logOut Successful" });
+  } catch (error) {
+     return res.json({ success: false, message: "server error" });
   }
 };
