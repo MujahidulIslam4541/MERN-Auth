@@ -61,7 +61,6 @@ export const register = async (req, res) => {
         The Support Team`,
     };
 
-    
     // Use your transporter to send the email
     await transporter.sendMail(mailOptions);
 
@@ -136,6 +135,34 @@ export const logOut = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie lifespan: 7 days (in milliseconds)
     });
     return res.json({ success: true, message: "user logOut Successful" });
+  } catch (error) {
+    return res.json({ success: false, message: "server error" });
+  }
+};
+
+// controller sends email to user for verification
+
+export const sendVerificationEmail = async (req, res) => {
+  try {
+    const userId = req.body;
+    const user = await UserModel.findById(userId);
+    if (user.isAccountVerified) {
+      return res.json({ success: false, message: "user already  verified" });
+    }
+    // create otp for email verification
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    user.verifyOTP = otp;
+    user.verifyOTPExpireAt = Date.now() + 1 * 60 * 60 * 1000;
+    await user.save();
+
+    const mailOptions = {
+      from: process.env.SENDER_EMAIL,
+      to: user.email,
+      subject: "Account Verification  OTP",
+      text: ` your otp is ${otp} .verify your account using this otp`,
+    };
+    await transporter.sendMail(mailOptions);
+    res.json({ success: true, message: "Verification otp send on email" });
   } catch (error) {
     return res.json({ success: false, message: "server error" });
   }
