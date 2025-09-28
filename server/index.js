@@ -23,7 +23,7 @@ app.get("/", (req, res) => {
 });
 
 // Import and use auth routes
-app.use("api/auth",authRouter)
+app.use("/api/auth",authRouter)
 
 // Start server
 app.listen(PORT, () => {
