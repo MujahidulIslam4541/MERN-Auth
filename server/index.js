@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
+import authRouter from "./routes/authRoutes.js";
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -14,12 +15,15 @@ app.use(cors({ credentials: true, origin: "http://localhost:3000" })); // replac
 
 
 // Database connection
-
 connectDB()
-// Routes
+
+// API Endpoints
 app.get("/", (req, res) => {
   res.send("hello world");
 });
+
+// Import and use auth routes
+app.use("api/auth",authRouter)
 
 // Start server
 app.listen(PORT, () => {
