@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import UserModel from "../models/userModels.js";
+import transporter from "../config/nodemailer.js";
 
 // Controller function for user registration
 export const register = async (req, res) => {
@@ -43,11 +44,22 @@ export const register = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // cookie valid for 7 days
     });
 
+    // send email to user for verification
+    const mailOptions = {
+      from: process.env.SENDER_EMAIL,
+      to: email,
+      subject: "send email using nodejs",
+      text: `hello this is test email ${email}`,
+    };
+
+    // Use your transporter to send the email
+    await transporter.sendMail(mailOptions);
+    
     // Step 6: Send success response back to client
     res.json({ success: true, message: "User registered successfully" });
   } catch (error) {
     // If any error occurs, send it back in response
-   return res.json({ success: false, message: error.message });
+    return res.json({ success: false, message: error.message });
   }
 };
 
@@ -100,7 +112,7 @@ export const login = async (req, res) => {
     return res.json({ success: true });
   } catch (error) {
     // On any error, respond with a generic server error message
-   return res.json({ success: false, message: "server error" });
+    return res.json({ success: false, message: "server error" });
   }
 };
 
@@ -115,6 +127,6 @@ export const logOut = async (req, res) => {
     });
     return res.json({ success: true, message: "user logOut Successful" });
   } catch (error) {
-     return res.json({ success: false, message: "server error" });
+    return res.json({ success: false, message: "server error" });
   }
 };
