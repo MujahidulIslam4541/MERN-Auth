@@ -143,26 +143,32 @@ export const logOut = async (req, res) => {
 // controller sends email to user for verification
 export const sendVerifyOtp = async (req, res) => {
   try {
-    const userId = req.body;
-    const user = await UserModel.findById({ _id: userId });
-    if (user.isAccountVerified) {
-      return res.json({ success: false, message: "user already  verified" });
+    const userId = req.user.id; // middleware থেকে আসা
+    const user = await UserModel.findById(userId);
+
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
     }
+
+    if (user.isAccountVerified) {
+      return res.json({ success: false, message: "User already verified" });
+    }
+
     // create otp for email verification
-    const otp = Math.floor(100000 + Math.random() * 900000);
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
     user.verifyOTP = otp;
-    user.verifyOTPExpireAt = Date.now() + 1 * 60 * 60 * 1000;
+    user.verifyOTPExpireAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
     await user.save();
 
-    console.log(user.email)
     const mailOptions = {
       from: process.env.SENDER_EMAIL,
       to: user.email,
-      subject: "Account Verification  OTP",
-      text: ` your otp is ${otp} .verify your account using this otp`,
+      subject: "Account Verification OTP",
+      text: `Your OTP is ${otp}. Verify your account using this OTP.`,
     };
+
     await transporter.sendMail(mailOptions);
-    res.json({ success: true, message: "Verification otp send on email" });
+    res.json({ success: true, message: "Verification OTP sent to email" });
   } catch (error) {
     return res.json({ success: false, message: error.message });
   }
@@ -170,29 +176,36 @@ export const sendVerifyOtp = async (req, res) => {
 
 // verify email with otp
 export const verifyEmail = async (req, res) => {
-  const { userId, otp } = req.body;
-  if (!userId || !otp) {
-    return res.json({ success: false, message: "missing Details" });
+  const { otp } = req.body;
+  const userId = req.user.id; // middleware থেকে আসা
+
+  if (!otp) {
+    return res.json({ success: false, message: "OTP is required" });
   }
+
   try {
-    const user = await UserModel.findOne({ _id: userId });
+    const user = await UserModel.findById(userId);
+
     if (!user) {
-      return res.json({ success: false, message: "user not found" });
+      return res.json({ success: false, message: "User not found" });
     }
-    if (user.verifyOTP === "" || user.verifyOTP !== otp) {
-      return res.json({ success: false, message: "INvalid OTP" });
+
+    if (user.verifyOTP !== otp) {
+      return res.json({ success: false, message: "Invalid OTP" });
     }
+
     if (user.verifyOTPExpireAt < Date.now()) {
       return res.json({ success: false, message: "OTP Expired" });
     }
+
     user.isAccountVerified = true;
     user.verifyOTP = "";
     user.verifyOTPExpireAt = 0;
 
     await user.save();
-    return res.json({ success: true, message: "verified email successfully" });
+
+    return res.json({ success: true, message: "Email verified successfully" });
   } catch (error) {
     return res.json({ success: false, message: error.message });
   }
 };
-
