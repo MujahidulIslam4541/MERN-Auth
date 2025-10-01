@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import { assets } from "../../public/assets";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(true); // true -> Sign Up, false -> Sign In
+  const [isSignUp, setIsSignUp] = useState(true);
+  const navigate = useNavigate() // true -> Sign Up, false -> Sign In
 
   return (
     <div className="bg-[url('/bg_img.png')] bg-cover bg-center min-h-screen flex flex-col items-center justify-center px-4 relative">
       {/* Logo Top Left */}
       <img
+        onClick={() => navigate('/')}
         src={assets.logo}
         alt="Logo"
         className="h-12 absolute top-6 left-6"
@@ -30,6 +33,7 @@ const LoginPage = () => {
               <input
                 type="text"
                 placeholder="Enter Your Name"
+                name="name"
                 className="w-full bg-transparent outline-none text-gray-700"
               />
             </div>
@@ -41,6 +45,7 @@ const LoginPage = () => {
             <input
               type="email"
               placeholder="Enter Your E-mail"
+              name="email"
               className="w-full bg-transparent outline-none text-gray-700"
             />
           </div>
@@ -51,6 +56,7 @@ const LoginPage = () => {
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Enter Your Password"
+              name="password"
               className="w-full bg-transparent outline-none text-gray-700"
             />
             <button
@@ -64,7 +70,7 @@ const LoginPage = () => {
 
           {/* Forgot Password (Only for Login) */}
           {!isSignUp && (
-            <p className="text-left text-sm text-gray-500 hover:text-gray-900 cursor-pointer">
+            <p onClick={()=>navigate('/resetPassword')} className="text-left text-sm text-gray-500 hover:text-gray-900 cursor-pointer">
               Forgot Password?
             </p>
           )}

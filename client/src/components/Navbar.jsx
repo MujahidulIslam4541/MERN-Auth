@@ -5,7 +5,7 @@ import { assets } from '../../public/assets'
 const Navbar = () => {
     return (
         <div>
-            <div className="navbar bg-base-100 shadow-sm px-4">
+            <div className="navbar  px-4">
                 {/* Left side */}
                 <div className="flex-1">
                     <img src={assets.logo} alt="Logo" className="h-10" />
