@@ -4,6 +4,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(true); // true -> Sign Up, false -> Sign In
 
   return (
     <div className="bg-[url('/bg_img.png')] bg-cover bg-center min-h-screen flex flex-col items-center justify-center px-4 relative">
@@ -15,21 +16,24 @@ const LoginPage = () => {
       />
 
       {/* Login Box */}
-      <div className="bg-white shadow-xl  w-full max-w-md p-8 rounded-xl">
+      <div className="bg-white shadow-xl w-full max-w-md p-8 rounded-xl">
+        {/* Title */}
         <h2 className="text-2xl font-bold text-center mb-6 text-gray-900">
-          Login Your Account
+          {isSignUp ? "Create Your Account" : "Login to Your Account"}
         </h2>
 
         <form className="space-y-4">
-          {/* Username */}
-          <div className="flex items-center border rounded-lg px-3 py-2 bg-gray-50">
-            <img src={assets.person_icon} alt="user" className="w-5 h-5 mr-2" />
-            <input
-              type="text"
-              placeholder="Enter Your Name"
-              className="w-full bg-transparent outline-none text-gray-700"
-            />
-          </div>
+          {/* Username (Only for Sign Up) */}
+          {isSignUp && (
+            <div className="flex items-center border rounded-lg px-3 py-2 bg-gray-50">
+              <img src={assets.person_icon} alt="user" className="w-5 h-5 mr-2" />
+              <input
+                type="text"
+                placeholder="Enter Your Name"
+                className="w-full bg-transparent outline-none text-gray-700"
+              />
+            </div>
+          )}
 
           {/* Email */}
           <div className="flex items-center border rounded-lg px-3 py-2 bg-gray-50">
@@ -58,25 +62,34 @@ const LoginPage = () => {
             </button>
           </div>
 
+          {/* Forgot Password (Only for Login) */}
+          {!isSignUp && (
+            <p className="text-left text-sm text-gray-500 hover:text-gray-900 cursor-pointer">
+              Forgot Password?
+            </p>
+          )}
+
           {/* Submit */}
           <button
             type="submit"
             className="w-full bg-gray-800 text-white py-2 rounded-lg hover:bg-gray-900 transition"
           >
-            Login
+            {isSignUp ? "Sign Up" : "Login"}
           </button>
         </form>
 
         {/* Footer */}
         <p className="text-center text-gray-400 mt-4 text-sm">
-          Don’t have an account?{" "}
-          <a href="/register" className="underline hover:text-white">
-            Sign Up
-          </a>
+          {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+          <button
+            onClick={() => setIsSignUp(!isSignUp)}
+            className="underline hover:text-gray-900"
+          >
+            {isSignUp ? "Login" : "Sign Up"}
+          </button>
         </p>
       </div>
     </div>
-
   );
 };
 
