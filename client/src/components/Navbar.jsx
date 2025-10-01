@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { assets } from '../../public/assets'
 import { AppContent } from '../context/AppContent'
 import toast from 'react-hot-toast'
@@ -7,6 +7,26 @@ import axios from 'axios'
 
 const Navbar = () => {
     const { userData, backendUrl, setUserData, setIsLoggedIn } = useContext(AppContent)
+    const navigate = useNavigate()
+
+
+    const sendVerificationOtp = async () => {
+        try {
+            axios.defaults.withCredentials = true;
+
+            const { data } = await axios.post(backendUrl + '/api/auth/send-verify-otp')
+            if (data.success) {
+                navigate('/emailVerification')
+                toast.success(data.message)
+            }
+            else {
+                toast.error(data.error)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
 
 
     const logOut = async () => {
@@ -15,7 +35,7 @@ const Navbar = () => {
             const { data } = await axios.post(backendUrl + '/api/auth/logOut')
             data.success && setIsLoggedIn(false)
             data.success && setUserData(false)
-            data.success&&toast.success("user logged out")
+            data.success && toast.success("user logged out")
         } catch (error) {
             toast.error(error.message)
         }
@@ -47,8 +67,9 @@ const Navbar = () => {
                             </p>
 
                             {/* Email Verification */}
-                            {userData?.isAccountVerified && (
+                            {!userData?.isAccountVerified && (
                                 <button
+                                onClick={sendVerificationOtp}
                                     className="w-full text-left px-4 py-1 text-sm text-blue-600 hover:bg-gray-100"
                                 >
                                     Verify Email
