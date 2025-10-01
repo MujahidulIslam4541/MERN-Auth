@@ -2,7 +2,9 @@ import { useContext, useState } from "react";
 import { assets } from "../../public/assets";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { AppContent  } from "../context/AppContent";
+import { AppContent } from "../context/AppContent";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 
 const LoginPage = () => {
@@ -14,15 +16,37 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const { backendUrl, isLoggedIn, setIsLoggedIn, userData, setUserData } = useContext(AppContent);
-  console.log(backendUrl, isLoggedIn, setEmail, setIsLoggedIn, userData, setUserData)
+  // console.log(backendUrl, isLoggedIn, setEmail, setIsLoggedIn, userData, setUserData)
 
   const handleOnSubmit = async (e) => {
-    e.preventDefault();
-    if (isSignUp) {
-      console.log("Sign Up Data:", { name, email, password });
-    } else {
-      console.log("Login Data:", { email, password });
+    try {
+      e.preventDefault();
+
+      if (isSignUp) {
+        console.log("Sign Up Data:", { name, email, password });
+        const { data } = await axios.post(backendUrl + '/api/auth/register', { name, email, password })
+
+        if (data.success) {
+          setIsLoggedIn(true)
+          navigate('/')
+        } else {
+          toast.error(data.message)
+        }
+      } else {
+        console.log("Login Data:", { email, password });
+        const { data } = await axios.post(backendUrl,+'/api/auth/logIn', { email, password })
+
+        if (data.success) {
+          setIsLoggedIn(true)
+          navigate('/')
+        } else {
+          toast.error(data.message)
+        }
+      }
+    } catch (error) {
+      return toast.error(error.message)
     }
+
   };
 
   return (
