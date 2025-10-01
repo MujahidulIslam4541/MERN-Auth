@@ -15,12 +15,13 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const { backendUrl, isLoggedIn, setIsLoggedIn, userData, setUserData } = useContext(AppContent);
+  const { backendUrl, setIsLoggedIn, getUserData } = useContext(AppContent);
   // console.log(backendUrl, isLoggedIn, setEmail, setIsLoggedIn, userData, setUserData)
 
   const handleOnSubmit = async (e) => {
     try {
       e.preventDefault();
+      axios.defaults.withCredentials = true;
 
       if (isSignUp) {
         console.log("Sign Up Data:", { name, email, password });
@@ -28,16 +29,19 @@ const LoginPage = () => {
 
         if (data.success) {
           setIsLoggedIn(true)
+          toast.success("user registation success ")
+          getUserData()
           navigate('/')
         } else {
           toast.error(data.message)
         }
       } else {
         console.log("Login Data:", { email, password });
-        const { data } = await axios.post(backendUrl,+'/api/auth/logIn', { email, password })
+        const { data } = await axios.post(backendUrl + '/api/auth/logIn', { email, password })
 
         if (data.success) {
           setIsLoggedIn(true)
+          getUserData()
           navigate('/')
         } else {
           toast.error(data.message)

@@ -1,6 +1,10 @@
+import { useContext } from 'react'
 import { assets } from '../../public/assets'
+import { AppContent } from '../context/AppContent'
 
 const Header = () => {
+    const { userData } = useContext(AppContent)
+    console.log(userData)
     return (
         <div className="flex flex-col items-center text-center p-6 max-w-lg mx-auto">
             {/* Header Image */}
@@ -12,7 +16,7 @@ const Header = () => {
 
             {/* Small Title with Wave */}
             <div className="flex items-center gap-2 mb-3">
-                <h2 className="text-lg font-medium tracking-wide">Hey Developer</h2>
+                <h2 className="text-lg font-medium tracking-wide">Hey {userData ? userData?.name : 'Developer'}</h2>
                 <img src={assets.hand_wave} alt="Wave" className="w-6 h-6" />
             </div>
 
