@@ -4,10 +4,11 @@ import Header from '../components/Header'
 
 const HomePage = () => {
   return (
-    <div>
-      <Navbar></Navbar>
-      <Header></Header>
+    <div className="bg-[url('/bg_img.png')] bg-cover bg-center min-h-screen">
+      <Navbar />
+      <Header />
     </div>
+
   )
 }
 
