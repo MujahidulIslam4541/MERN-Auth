@@ -8,12 +8,13 @@ export const AppContextProvider = (props) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [userData, setUserData] = useState(false)
 
+    axios.defaults.withCredentials = true;
     const getAuthState = async () => {
         try {
             const { data } = await axios.get(backendUrl + '/api/auth/is-auth')
-            if (data.success) {
+            if (data?.success) {
                 setIsLoggedIn(true)
-                getUserData()
+                await getUserData()
             }
         } catch (error) {
             toast.error(error.message)

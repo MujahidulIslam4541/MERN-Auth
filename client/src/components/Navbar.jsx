@@ -2,10 +2,26 @@ import React, { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { assets } from '../../public/assets'
 import { AppContent } from '../context/AppContent'
+import toast from 'react-hot-toast'
+import axios from 'axios'
 
 const Navbar = () => {
     const { userData, backendUrl, setUserData, setIsLoggedIn } = useContext(AppContent)
-    console.log(userData, backendUrl, setIsLoggedIn, setUserData)
+
+
+    const logOut = async () => {
+        try {
+            axios.defaults.withCredentials = true;
+            const { data } = await axios.post(backendUrl + '/api/auth/logOut')
+            data.success && setIsLoggedIn(false)
+            data.success && setUserData(false)
+            data.success&&toast.success("user logged out")
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+
     return (
         <div>
             <div className="navbar  px-4">
@@ -31,7 +47,7 @@ const Navbar = () => {
                             </p>
 
                             {/* Email Verification */}
-                            {!userData?.isAccountVerified && (
+                            {userData?.isAccountVerified && (
                                 <button
                                     className="w-full text-left px-4 py-1 text-sm text-blue-600 hover:bg-gray-100"
                                 >
@@ -41,6 +57,7 @@ const Navbar = () => {
 
                             {/* Logout */}
                             <button
+                                onClick={logOut}
                                 className="w-full text-left px-4 py-1 text-sm text-red-600 hover:bg-gray-100"
                             >
                                 Log Out
