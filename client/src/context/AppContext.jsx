@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AppContext } from "./App.Context";
+import { AppContent  } from "./AppContent";
 
 export const AppContextProvider = (props) => {
     const backendUrl = import.meta.env.BACKEND_URL;
@@ -13,8 +13,8 @@ export const AppContextProvider = (props) => {
         setUserData
     }
     return (
-        <AppContext.Provider value={value}>
+        <AppContent.Provider value={value}>
             {props.children}
-        </AppContext.Provider>
+        </AppContent.Provider>
     )
 }

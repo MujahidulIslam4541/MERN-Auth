@@ -1,12 +1,29 @@
-import React, { useState } from "react";
+import { useContext, useState } from "react";
 import { assets } from "../../public/assets";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { AppContent  } from "../context/AppContent";
+
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(true);
-  const navigate = useNavigate() // true -> Sign Up, false -> Sign In
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
+  const { backendUrl, isLoggedIn, setIsLoggedIn, userData, setUserData } = useContext(AppContent);
+  console.log(backendUrl, isLoggedIn, setEmail, setIsLoggedIn, userData, setUserData)
+
+  const handleOnSubmit = async (e) => {
+    e.preventDefault();
+    if (isSignUp) {
+      console.log("Sign Up Data:", { name, email, password });
+    } else {
+      console.log("Login Data:", { email, password });
+    }
+  };
 
   return (
     <div className="bg-[url('/bg_img.png')] bg-cover bg-center min-h-screen flex flex-col items-center justify-center px-4 relative">
@@ -20,12 +37,11 @@ const LoginPage = () => {
 
       {/* Login Box */}
       <div className="bg-white shadow-xl w-full max-w-md p-8 rounded-xl">
-        {/* Title */}
         <h2 className="text-2xl font-bold text-center mb-6 text-gray-900">
           {isSignUp ? "Create Your Account" : "Login to Your Account"}
         </h2>
 
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleOnSubmit}>
           {/* Username (Only for Sign Up) */}
           {isSignUp && (
             <div className="flex items-center border rounded-lg px-3 py-2 bg-gray-50">
@@ -34,6 +50,8 @@ const LoginPage = () => {
                 type="text"
                 placeholder="Enter Your Name"
                 name="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="w-full bg-transparent outline-none text-gray-700"
               />
             </div>
@@ -46,6 +64,8 @@ const LoginPage = () => {
               type="email"
               placeholder="Enter Your E-mail"
               name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-transparent outline-none text-gray-700"
             />
           </div>
@@ -57,6 +77,8 @@ const LoginPage = () => {
               type={showPassword ? "text" : "password"}
               placeholder="Enter Your Password"
               name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-transparent outline-none text-gray-700"
             />
             <button
@@ -70,7 +92,7 @@ const LoginPage = () => {
 
           {/* Forgot Password (Only for Login) */}
           {!isSignUp && (
-            <p onClick={()=>navigate('/resetPassword')} className="text-left text-sm text-gray-500 hover:text-gray-900 cursor-pointer">
+            <p onClick={() => navigate('/resetPassword')} className="text-left text-sm text-gray-500 hover:text-gray-900 cursor-pointer">
               Forgot Password?
             </p>
           )}
