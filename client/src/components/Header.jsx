@@ -4,7 +4,6 @@ import { AppContent } from '../context/AppContent'
 
 const Header = () => {
     const { userData } = useContext(AppContent)
-    console.log(userData)
     return (
         <div className="flex flex-col items-center text-center p-6 max-w-lg mx-auto">
             {/* Header Image */}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppContent } from "./AppContent";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -8,6 +8,21 @@ export const AppContextProvider = (props) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [userData, setUserData] = useState(false)
 
+    const getAuthState = async () => {
+        try {
+            const { data } = await axios.get(backendUrl + '/api/auth/is-auth')
+            if (data.success) {
+                setIsLoggedIn(true)
+                getUserData()
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    useEffect(() => {
+        getAuthState()
+    }, [])
 
     const getUserData = async () => {
         try {
