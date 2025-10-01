@@ -12,7 +12,7 @@ const app = express();
 // Middleware
 app.use(express.json()); // use express.json() for parsing JSON
 app.use(cookieParser());
-app.use(cors({ credentials: true, origin: "http://localhost:3000" })); // replace origin with your frontend URL
+app.use(cors({ credentials: true, origin: "http://localhost:5173" })); // replace origin with your frontend URL
 
 // Database connection
 connectDB();

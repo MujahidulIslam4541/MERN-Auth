@@ -3,6 +3,6 @@ import userAuth from "../middleware/userAuth.js";
 import { getUserProfile } from "../controller/userController.js";
 const userRouter = express.Router();
 
-userRouter.get("/profileData/:id", userAuth, getUserProfile);
+userRouter.get("/profileData", userAuth, getUserProfile);
 
 export default userRouter;
