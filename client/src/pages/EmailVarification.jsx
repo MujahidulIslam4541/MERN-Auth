@@ -9,6 +9,11 @@ const EmailVerification = () => {
             inputRef.current[index + 1].focus()
         }
     }
+    const handleKeyDown = (e, index) => {
+        if (e.key === 'Backspace' && e.target.value == '' && index > 0) {
+            inputRef.current[index - 1].focus()
+        }
+    }
 
     return (
         <div className="bg-[url('/bg_img.png')] bg-cover bg-center min-h-screen relative">
@@ -47,6 +52,7 @@ const EmailVerification = () => {
                                 className="w-12 h-12 text-center text-gray-900 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 ref={event => inputRef.current[index] = event}
                                 onInput={(e) => handleInput(e, index)}
+                                onKeyDown={(e) => handleKeyDown(e, index)}
                             />
                         ))}
                     </div>
