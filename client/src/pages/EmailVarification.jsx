@@ -1,4 +1,4 @@
-import { useContext, useRef } from 'react'
+import { useContext, useEffect, useRef } from 'react'
 import { assets } from '../../public/assets'
 import { AppContent } from '../context/AppContent'
 import toast from 'react-hot-toast'
@@ -53,12 +53,16 @@ const EmailVerification = () => {
         }
     }
 
+    useEffect(() => {
+        isLoggedIn && userData && userData.isAccountVerified && navigate('/')
+    }, [isLoggedIn, userData])
+
     return (
         <div className="bg-[url('/bg_img.png')] bg-cover bg-center min-h-screen relative">
 
             {/* Navbar Logo */}
             <div className="absolute top-4 left-4">
-                <img src={assets.logo} alt="Logo" className="h-12" />
+                <img src={assets.logo} alt="Logo" className="h-12" onClick={navigate('/')}/>
             </div>
 
             {/* Centered OTP Card */}
@@ -72,13 +76,6 @@ const EmailVerification = () => {
                     <p className="text-center text-gray-300 mb-6">
                         Please enter the OTP sent to your email address
                     </p>
-
-                    {/* Email Input */}
-                    {/* <input
-                        type="email"
-                        placeholder="Enter Your Email"
-                        className="w-full px-4 py-2 rounded-lg border mb-6"
-                    /> */}
 
                     {/* OTP Fields */}
                     <div className="flex justify-between mb-6">
