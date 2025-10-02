@@ -1,7 +1,15 @@
-import React from 'react'
+import { useRef } from 'react'
 import { assets } from '../../public/assets'
 
 const EmailVerification = () => {
+    const inputRef = useRef([])
+
+    const handleInput = (e, index) => {
+        if (e.target.value.length > 0 && index < inputRef.current.length - 1) {
+            inputRef.current[index + 1].focus()
+        }
+    }
+
     return (
         <div className="bg-[url('/bg_img.png')] bg-cover bg-center min-h-screen relative">
 
@@ -23,11 +31,11 @@ const EmailVerification = () => {
                     </p>
 
                     {/* Email Input */}
-                    <input
+                    {/* <input
                         type="email"
                         placeholder="Enter Your Email"
                         className="w-full px-4 py-2 rounded-lg border mb-6"
-                    />
+                    /> */}
 
                     {/* OTP Fields */}
                     <div className="flex justify-between mb-6">
@@ -37,13 +45,15 @@ const EmailVerification = () => {
                                 type="text"
                                 maxLength={1}
                                 className="w-12 h-12 text-center text-gray-900 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                ref={event => inputRef.current[index] = event}
+                                onInput={(e) => handleInput(e, index)}
                             />
                         ))}
                     </div>
 
                     {/* Submit Button */}
                     <button className="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-lg text-white font-semibold transition">
-                        Verify OTP
+                        Verify Email
                     </button>
                 </div>
             </div>
