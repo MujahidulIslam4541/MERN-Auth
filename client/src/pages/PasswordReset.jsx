@@ -10,7 +10,7 @@ const PasswordReset = () => {
   const navigate = useNavigate()
   const inputRef = useRef([])
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
 
@@ -56,6 +56,33 @@ const PasswordReset = () => {
       else {
         toast.error(data.message)
       }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
+  // otp submitted
+  const onsubmitOtp = async (e) => {
+    e.preventDefault()
+    const ArrayOtp = inputRef.current.map(e => e.value)
+    setOtp(ArrayOtp.join(''))
+    setIsOtpSubmitted(true)
+  }
+
+  // submit new password
+  const onSubmitNewPassword = async (e) => {
+    e.preventDefault()
+    try {
+      const { data } = await axios.post(backendUrl + '/api/auth/reset-password', { email, otp, newPassword })
+
+      if (data.success) {
+        toast.success(data.message)
+        navigate('/login')
+      }
+      else {
+        toast.error(data.message)
+      }
+
     } catch (error) {
       toast.error(error.message)
     }
@@ -108,7 +135,7 @@ const PasswordReset = () => {
 
         {/* otp fields */}
         {!isOtpSubmitted && isEmailSend &&
-          <form className="bg-gray-900 text-white rounded-xl shadow-xl w-full max-w-md p-8">
+          <form onSubmit={onsubmitOtp} className="bg-gray-900 text-white rounded-xl shadow-xl w-full max-w-md p-8">
             {/* Heading */}
             <h2 className="text-center text-2xl font-semibold mb-4">
               Enter Your 6-Digit OTP
@@ -144,9 +171,10 @@ const PasswordReset = () => {
         {/* new password */}
         {isOtpSubmitted && isEmailSend &&
           <div className="flex items-center justify-center min-h-screen px-4">
-            <form className="bg-gray-900 text-white rounded-xl shadow-xl w-full max-w-md p-8">
+            <form onSubmit={onSubmitNewPassword} className="bg-gray-900 text-white rounded-xl shadow-xl w-full max-w-md p-8">
 
               {/* Heading */}
+
               <h2 className="text-center text-2xl font-semibold mb-4">
                 Enter New Password
               </h2>
@@ -161,8 +189,8 @@ const PasswordReset = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter Your New Password"
                   name="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full bg-transparent outline-none text-gray-700"
                 />
                 <button
