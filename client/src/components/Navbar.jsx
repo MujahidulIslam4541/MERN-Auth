@@ -67,7 +67,7 @@ const Navbar = () => {
                             </p>
 
                             {/* Email Verification */}
-                            {!userData?.isAccountVerified && (
+                            {userData?.isAccountVerified && (
                                 <button
                                 onClick={sendVerificationOtp}
                                     className="w-full text-left px-4 py-1 text-sm text-blue-600 hover:bg-gray-100"

@@ -1,8 +1,15 @@
-import { useRef } from 'react'
+import { useContext, useRef } from 'react'
 import { assets } from '../../public/assets'
+import { AppContent } from '../context/AppContent'
+import toast from 'react-hot-toast'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 const EmailVerification = () => {
+    const navigate = useNavigate()
     const inputRef = useRef([])
+    axios.defaults.withCredentials = true;
+    const { backendUrl, isLoggedIn, getUserData, userData } = useContext(AppContent)
 
     const handleInput = (e, index) => {
         if (e.target.value.length > 0 && index < inputRef.current.length - 1) {
@@ -25,6 +32,27 @@ const EmailVerification = () => {
         });
     }
 
+    const handleVerifyOtp = async (e) => {
+        try {
+            e.preventDefault()
+            const otpArray = inputRef.current.map(e => e.value)
+            const otp = otpArray.join('')
+
+            const { data } = await axios.post(backendUrl + '/api/auth/verify-account', { otp })
+
+            if (data.success) {
+                toast.success(data.message)
+                getUserData()
+                navigate('/')
+            } else {
+                toast.error(data.message)
+            }
+
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
     return (
         <div className="bg-[url('/bg_img.png')] bg-cover bg-center min-h-screen relative">
 
@@ -35,7 +63,7 @@ const EmailVerification = () => {
 
             {/* Centered OTP Card */}
             <div className="flex items-center justify-center min-h-screen px-4">
-                <div className="bg-gray-900 text-white rounded-xl shadow-xl w-full max-w-md p-8">
+                <form onSubmit={handleVerifyOtp} className="bg-gray-900 text-white rounded-xl shadow-xl w-full max-w-md p-8">
 
                     {/* Heading */}
                     <h2 className="text-center text-2xl font-semibold mb-4">
@@ -72,7 +100,7 @@ const EmailVerification = () => {
                     <button className="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-lg text-white font-semibold transition">
                         Verify Email
                     </button>
-                </div>
+                </form>
             </div>
         </div>
     )
