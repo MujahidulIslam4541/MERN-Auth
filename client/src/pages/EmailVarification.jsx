@@ -15,6 +15,16 @@ const EmailVerification = () => {
         }
     }
 
+    const handlePaste = (e) => {
+        const paste = e.clipboardData.getData('text')
+        const pasteArray = paste.split('')
+        pasteArray.forEach((char, index) => {
+            if (inputRef.current[index]) {
+                inputRef.current[index].value = char;
+            }
+        });
+    }
+
     return (
         <div className="bg-[url('/bg_img.png')] bg-cover bg-center min-h-screen relative">
 
@@ -53,6 +63,7 @@ const EmailVerification = () => {
                                 ref={event => inputRef.current[index] = event}
                                 onInput={(e) => handleInput(e, index)}
                                 onKeyDown={(e) => handleKeyDown(e, index)}
+                                onPaste={handlePaste}
                             />
                         ))}
                     </div>
