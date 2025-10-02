@@ -62,7 +62,7 @@ const EmailVerification = () => {
 
             {/* Navbar Logo */}
             <div className="absolute top-4 left-4">
-                <img src={assets.logo} alt="Logo" className="h-12" onClick={navigate('/')}/>
+                <img src={assets.logo} alt="Logo" className="h-12" onClick={navigate('/')} />
             </div>
 
             {/* Centered OTP Card */}
