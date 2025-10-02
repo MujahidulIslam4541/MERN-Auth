@@ -132,165 +132,242 @@ export const login = async (req, res) => {
 // Controller function for user logOut
 export const logOut = async (req, res) => {
   try {
+    // Clearing the 'token' cookie from the user's browser
+    // This is how we effectively log out the user from the server side.
     res.clearCookie("token", {
-      httpOnly: true, // Prevents client-side JS from reading the cookie (mitigates XSS)
-      secure: process.env.NODE_ENV === "production", // Send cookie only over HTTPS in production
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", // cross-site cookie behavior
-      maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie lifespan: 7 days (in milliseconds)
+      httpOnly: true, // This ensures that the cookie cannot be accessed via client-side JavaScript.
+      // It helps prevent Cross-Site Scripting (XSS) attacks.
+      secure: process.env.NODE_ENV === "production",
+      // In production environment, this cookie will only be sent over HTTPS.
+      // In development (localhost), it can be sent over HTTP.
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      // sameSite attribute controls whether the cookie is sent along with cross-site requests.
+      // "strict" prevents sending in cross-site requests (good for dev).
+      // "none" allows cross-site usage (necessary for production with HTTPS and cross-domain frontend/backend).
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      // Sets the cookie expiration time.
+      // Here it is 7 days in milliseconds (7 days * 24 hours * 60 minutes * 60 seconds * 1000 ms)
     });
+
+    // Sending JSON response back to the client indicating successful logout
     return res.json({ success: true, message: "user logOut Successful" });
   } catch (error) {
+    // Catch any errors that happen during logout process and send error response
     return res.json({ success: false, message: "server error" });
   }
 };
 
-// controller sends email to user for verification
+// Controller function to send a verification OTP to the user's email
 export const sendVerifyOtp = async (req, res) => {
   try {
-    const userId = req.user.id; // middleware থেকে আসা
+    // Get user ID from the authenticated request (middleware must attach user info to req)
+    const userId = req.user.id;
+
+    // Find the user in the database using their ID
     const user = await UserModel.findById(userId);
 
+    // If user does not exist, send error response
     if (!user) {
       return res.json({ success: false, message: "User not found" });
     }
 
+    // If the user's account is already verified, send an error response
     if (user.isAccountVerified) {
       return res.json({ success: false, message: "User already verified" });
     }
 
-    // create otp for email verification
+    // Generate a 6-digit OTP for email verification
     const otp = String(Math.floor(100000 + Math.random() * 900000));
+
+    // Save the OTP and its expiration time in the user document
     user.verifyOTP = otp;
-    user.verifyOTPExpireAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
+    user.verifyOTPExpireAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour expiration
     await user.save();
 
+    // Prepare the email options including sender, recipient, subject, and HTML content
     const mailOptions = {
-      from: process.env.SENDER_EMAIL,
-      to: user.email,
-      subject: "Account Verification OTP",
-      // text: `Your OTP is ${otp}. Verify your account using this OTP.`,
+      from: process.env.SENDER_EMAIL, // Email address of the sender from environment variables
+      to: user.email, // Recipient email address
+      subject: "Account Verification OTP", // Email subject line
+      // text: `Your OTP is ${otp}. Verify your account using this OTP.`, // Plain text alternative (optional)
       html: EMAIL_VERIFY_TEMPLATE.replace("{{otp}}", otp).replace(
         "{{email}}",
         user.email
-      ),
+      ), // HTML template with OTP and user email dynamically inserted
     };
 
+    // Send the email using the configured transporter
     await transporter.sendMail(mailOptions);
+
+    // Respond to the client indicating the OTP has been sent successfully
     res.json({ success: true, message: "Verification OTP sent to email" });
   } catch (error) {
+    // Catch any errors and send them in the response
     return res.json({ success: false, message: error.message });
   }
 };
 
-// verify email with otp
+// Controller function to verify user's email using OTP
 export const verifyEmail = async (req, res) => {
+  // Extract OTP from request body
   const { otp } = req.body;
-  const userId = req.user.id; // middleware থেকে আসা
 
+  // Get user ID from authenticated request (middleware should attach user info to req)
+  const userId = req.user.id;
+
+  // If OTP is not provided in request, return error
   if (!otp) {
     return res.json({ success: false, message: "OTP is required" });
   }
 
   try {
+    // Find the user in the database using their ID
     const user = await UserModel.findById(userId);
 
+    // If user is not found in database, return error
     if (!user) {
       return res.json({ success: false, message: "User not found" });
     }
 
+    // Check if provided OTP matches the one saved in the database
     if (user.verifyOTP !== otp) {
       return res.json({ success: false, message: "Invalid OTP" });
     }
 
+    // Check if OTP has expired
     if (user.verifyOTPExpireAt < Date.now()) {
       return res.json({ success: false, message: "OTP Expired" });
     }
 
+    // Mark user's account as verified
     user.isAccountVerified = true;
+
+    // Clear OTP and expiration time from user document
     user.verifyOTP = "";
     user.verifyOTPExpireAt = 0;
 
+    // Save updated user data to the database
     await user.save();
 
+    // Return success response
     return res.json({ success: true, message: "Email verified successfully" });
   } catch (error) {
+    // Catch any errors and return them in the response
     return res.json({ success: false, message: error.message });
   }
 };
 
-// checked  is authenticated
+// Controller function to check if the user is authenticated
 export const isAuthenticated = async (req, res) => {
   try {
+    // Simply return success true if this endpoint is reached
+    // Assumes that authentication middleware has already verified the user's token/session
     return res.json({ success: true });
   } catch (error) {
+    // Catch any unexpected errors and return them in the response
     return res.json({ success: false, message: error.message });
   }
 };
 
-// reset otp send the your email
+// Controller function to send a reset password OTP to user's email
 export const resetPasswordOTP = async (req, res) => {
+  // Extract email from request body
   const { email } = req.body;
+
+  // Check if email is provided
   if (!email) {
-    return res.json({ success: false, message: "message is required" });
+    return res.json({ success: false, message: "email is required" });
   }
+
   try {
+    // Find user in the database using the provided email
     const user = await UserModel.findOne({ email });
+
+    // If user does not exist, return error
     if (!user) {
-      return res.json({ success: false, message: "user not Found" });
+      return res.json({ success: false, message: "User not found" });
     }
-    // create reset password otp
+
+    // Generate a 6-digit OTP for password reset
     const otp = String(Math.floor(100000 + Math.random() * 900000));
+
+    // Save the OTP and its expiration time in the user document
     user.resetOTP = otp;
-    user.resetOTPExpireAt = Date.now() + 10 * 60 * 1000; // 10 minute
+    user.resetOTPExpireAt = Date.now() + 10 * 60 * 1000; // 10 minutes
     await user.save();
 
+    // Prepare email options
     const mailOptions = {
-      from: process.env.SENDER_EMAIL,
-      to: user.email,
-      subject: "password reset otp",
-      // text: `Your reset password OTP  ${otp}.`,
+      from: process.env.SENDER_EMAIL, // Sender email from environment variables
+      to: user.email, // Recipient email
+      subject: "Password Reset OTP", // Subject of the email
+      // text: `Your reset password OTP  ${otp}.`, // Optional plain text version
       html: PASSWORD_RESET_TEMPLATE.replace("{{otp}}", otp).replace(
         "{{email}}",
         user.email
-      ),
+      ), // HTML template with OTP and email dynamically inserted
     };
 
+    // Send the OTP email
     await transporter.sendMail(mailOptions);
-    res.json({ success: true, message: "reset password OTP sent to email" });
+
+    // Respond to client indicating OTP has been sent
+    res.json({ success: true, message: "Reset password OTP sent to email" });
   } catch (error) {
+    // Catch any unexpected errors and return them in the response
     return res.json({ success: false, message: error.message });
   }
 };
 
+
+// Controller function to reset user's password using OTP
+
 export const resetPassword = async (req, res) => {
+  // Extract email, OTP, and new password from request body
   const { email, otp, newPassword } = req.body;
+
+  // Validate all required fields
   if (!email || !otp || !newPassword) {
-    return res.json({ success: false, message: "all field are required" });
+    return res.json({ success: false, message: "All fields are required" });
   }
+
   try {
+    // Find user in the database using the provided email
     const user = await UserModel.findOne({ email });
+
+    // If user does not exist, return error
     if (!user) {
-      return res.json({ success: false, message: "user not found" });
+      return res.json({ success: false, message: "User not found" });
     }
+
+    // Check if OTP exists and matches the one in the database
     if (user.resetOTP === "" || user.resetOTP !== otp) {
-      return res.json({ success: false, message: "Invalid otp" });
+      return res.json({ success: false, message: "Invalid OTP" });
     }
+
+    // Check if OTP has expired
     if (user.resetOTPExpireAt < Date.now()) {
-      return res.json({ success: false, message: "otp time expired" });
+      return res.json({ success: false, message: "OTP time expired" });
     }
+
+    // Hash the new password using bcrypt
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
+    // Update user's password and clear OTP and expiration time
     user.password = hashedPassword;
     user.resetOTP = "";
     user.resetOTPExpireAt = 0;
 
+    // Save updated user data to the database
     await user.save();
 
+    // Return success response to the client
     return res.json({
       success: true,
-      message: "your password has been reset successfully",
+      message: "Your password has been reset successfully",
     });
   } catch (error) {
+    // Catch any unexpected errors and return them
     res.json({ success: false, message: error.message });
   }
 };
