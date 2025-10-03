@@ -3,7 +3,6 @@ import HomePage from "../pages/HomePage";
 import LoginPage from "../pages/LoginPage";
 import PasswordReset from "../pages/PasswordReset";
 import EmailVerification from "../pages/EmailVarification";
-import Todo from "../pages/todo/todo";
 
 export const router = createBrowserRouter([
     {

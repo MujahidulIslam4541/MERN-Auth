@@ -11,7 +11,10 @@ const HomePage = () => {
     <div className="bg-[url('/bg_img.png')] bg-cover bg-center min-h-screen">
       <Navbar />
       <Header />
-      <Todo />
+      {isLoggedIn && userData.isVerified ? <Todo /> : <div>
+        <h2>Please login and verify your account to access Todo section.</h2>
+      </div>}
+
     </div>
 
   )
