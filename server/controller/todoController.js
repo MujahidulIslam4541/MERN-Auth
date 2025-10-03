@@ -1,4 +1,4 @@
-import { createTodo } from "../services/todoService";
+import { createTodo } from "../services/todoService.js";
 
 export const createTodoController = async (req, res) => {
   try {

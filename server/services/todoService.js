@@ -1,4 +1,5 @@
-import ToDoModel from "../models/todoModel.js";
+import ToDoModel from "../models/todoModels.js";
+
 
 
 export const createTodo = async (userId, data) => {
