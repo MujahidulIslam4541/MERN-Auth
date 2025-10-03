@@ -55,7 +55,6 @@ const EmailVerification = () => {
     }
 
     useEffect(() => {
-
         if (userData?.isAccountVerified) {
             navigate('/');
         }
