@@ -54,14 +54,14 @@
 //       subject: "📧 Email Verification - Complete Your Registration",
 //       text: `Hello ${email},
 
-//         Thank you for registering with us! 🎉  
+//         Thank you for registering with us! 🎉
 
-//         To complete your account setup and verify your email address, please click the verification link we’ve sent to you.  
-//         If you don’t verify your email, you may not be able to access all the features of your account.  
+//         To complete your account setup and verify your email address, please click the verification link we’ve sent to you.
+//         If you don’t verify your email, you may not be able to access all the features of your account.
 
-//         If you didn’t request this registration, you can safely ignore this email.  
+//         If you didn’t request this registration, you can safely ignore this email.
 
-//         Best regards,  
+//         Best regards,
 //         The Support Team`,
 //     };
 
@@ -319,7 +319,6 @@
 //   }
 // };
 
-
 // // Controller function to reset user's password using OTP
 
 // export const resetPassword = async (req, res) => {
@@ -372,24 +371,44 @@
 //     res.json({ success: false, message: error.message });
 //   }
 // };
-// controllers/authController.js
 
+// controllers/authController.js
 import {
   registerService,
   loginService,
-  sendVerifyOtpService,
+  // sendVerifyOtpService,
   verifyEmailService,
   resetPasswordOtpService,
   resetPasswordService,
 } from "../services/authService.js";
 
+// // ==================== REGISTER ====================
+// export const register = async (req, res) => {
+//   try {
+//     const { name, email, password } = req.body;
+
+//     // Call service
+//     const { token } = await registerService({ name, email, password });
+
+//     // Save token in cookie
+//     res.cookie("token", token, {
+//       httpOnly: true,
+//       secure: process.env.NODE_ENV === "production",
+//       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+//       maxAge: 7 * 24 * 60 * 60 * 1000,
+//     });
+
+//     res.json({ success: true, message: "User registered successfully" });
+//   } catch (error) {
+//     res.json({ success: false, message: error.message });
+//   }
+// };
+
 // ==================== REGISTER ====================
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-
-    // Call service
-    const { token } = await registerService({ name, email, password });
+    const { token, newUser } = await registerService({ name, email, password });
 
     // Save token in cookie
     res.cookie("token", token, {
@@ -399,7 +418,12 @@ export const register = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.json({ success: true, message: "User registered successfully" });
+    res.json({
+      success: true,
+      message:
+        "User registered successfully. Please check your email for OTP verification.",
+      userId: newUser._id, // frontend will need this for verifyEmail API
+    });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
@@ -444,14 +468,14 @@ export const logOut = async (req, res) => {
 };
 
 // ==================== SEND VERIFY OTP ====================
-export const sendVerifyOtp = async (req, res) => {
-  try {
-    await sendVerifyOtpService(req.user.id);
-    res.json({ success: true, message: "Verification OTP sent" });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-};
+// export const sendVerifyOtp = async (req, res) => {
+//   try {
+//     await sendVerifyOtpService(req.user.id);
+//     res.json({ success: true, message: "Verification OTP sent" });
+//   } catch (error) {
+//     res.json({ success: false, message: error.message });
+//   }
+// };
 
 // ==================== VERIFY EMAIL ====================
 export const verifyEmail = async (req, res) => {

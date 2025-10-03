@@ -8,34 +8,72 @@ import {
   PASSWORD_RESET_TEMPLATE,
 } from "../config/emailTemplates.js";
 
+// // ==================== REGISTER SERVICE ====================
+// export const registerService = async ({ name, email, password }) => {
+//   // Check if user already exists
+//   const ExistingUser = await UserModel.findOne({ email });
+//   if (ExistingUser) {
+//     throw new Error("User already exists");
+//   }
+
+//   // Hash password before saving
+//   const hashedPassword = await bcrypt.hash(password, 10);
+
+//   // Save new user to DB
+//   const newUser = new UserModel({ name, email, password: hashedPassword });
+//   await newUser.save();
+
+//   // Create JWT token
+//   const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+//     expiresIn: "1d",
+//   });
+
+//   // Send verification email (simple version)
+//   const mailOptions = {
+//     from: process.env.SENDER_EMAIL,
+//     to: email,
+//     subject: "📧 Email Verification - Complete Your Registration",
+//     text: `Hello ${email}, Please verify your account.`,
+//   };
+//   await transporter.sendMail(mailOptions);
+
+//   return { token, newUser };
+// };
+
 // ==================== REGISTER SERVICE ====================
 export const registerService = async ({ name, email, password }) => {
   // Check if user already exists
-  const ExistingUser = await UserModel.findOne({ email });
-  if (ExistingUser) {
-    throw new Error("User already exists");
-  }
+  const existingUser = await UserModel.findOne({ email });
+  if (existingUser) throw new Error("User already exists");
 
-  // Hash password before saving
+  // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // Save new user to DB
+  // Create new user
   const newUser = new UserModel({ name, email, password: hashedPassword });
+
+  // Generate OTP for verification
+  const otp = String(Math.floor(100000 + Math.random() * 900000));
+  newUser.verifyOTP = otp;
+  newUser.verifyOTPExpireAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
   await newUser.save();
 
-  // Create JWT token
-  const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-    expiresIn: "1d",
-  });
-
-  // Send verification email (simple version)
+  // Send OTP via email
   const mailOptions = {
     from: process.env.SENDER_EMAIL,
     to: email,
-    subject: "📧 Email Verification - Complete Your Registration",
-    text: `Hello ${email}, Please verify your account.`,
+    subject: "Account Verification OTP",
+    html: EMAIL_VERIFY_TEMPLATE.replace("{{otp}}", otp).replace(
+      "{{email}}",
+      email
+    ),
   };
   await transporter.sendMail(mailOptions);
+
+  // Generate JWT token
+  const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+    expiresIn: "1d",
+  });
 
   return { token, newUser };
 };
@@ -59,32 +97,32 @@ export const loginService = async ({ email, password }) => {
 };
 
 // ==================== SEND VERIFY OTP SERVICE ====================
-export const sendVerifyOtpService = async (userId) => {
-  // Find user by ID
-  const user = await UserModel.findById(userId);
-  if (!user) throw new Error("User not found");
-  if (user.isAccountVerified) throw new Error("User already verified");
+// export const sendVerifyOtpService = async (userId) => {
+//   // Find user by ID
+//   const user = await UserModel.findById(userId);
+//   if (!user) throw new Error("User not found");
+//   if (user.isAccountVerified) throw new Error("User already verified");
 
-  // Generate OTP
-  const otp = String(Math.floor(100000 + Math.random() * 900000));
-  user.verifyOTP = otp;
-  user.verifyOTPExpireAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
-  await user.save();
+//   // Generate OTP
+//   const otp = String(Math.floor(100000 + Math.random() * 900000));
+//   user.verifyOTP = otp;
+//   user.verifyOTPExpireAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
+//   await user.save();
 
-  // Send OTP via email
-  const mailOptions = {
-    from: process.env.SENDER_EMAIL,
-    to: user.email,
-    subject: "Account Verification OTP",
-    html: EMAIL_VERIFY_TEMPLATE.replace("{{otp}}", otp).replace(
-      "{{email}}",
-      user.email
-    ),
-  };
+//   // Send OTP via email
+//   const mailOptions = {
+//     from: process.env.SENDER_EMAIL,
+//     to: user.email,
+//     subject: "Account Verification OTP",
+//     html: EMAIL_VERIFY_TEMPLATE.replace("{{otp}}", otp).replace(
+//       "{{email}}",
+//       user.email
+//     ),
+//   };
 
-  await transporter.sendMail(mailOptions);
-  return true;
-};
+//   await transporter.sendMail(mailOptions);
+//   return true;
+// };
 
 // ==================== VERIFY EMAIL SERVICE ====================
 export const verifyEmailService = async (userId, otp) => {
