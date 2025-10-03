@@ -1,4 +1,4 @@
-import { createTodo } from "../services/todoService.js";
+import { createTodo, getTodosByUser } from "../services/todoService.js";
 
 export const createTodoController = async (req, res) => {
   try {
@@ -19,6 +19,20 @@ export const createTodoController = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
+      message: "server error",
+    });
+  }
+};
+
+export const getTodosByUserController = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const todos = await getTodosByUser(userId);
+
+    res.json({ success: true, data: todos });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
       message: "server error",
     });
   }
