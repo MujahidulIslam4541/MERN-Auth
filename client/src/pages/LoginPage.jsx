@@ -16,7 +16,6 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const { backendUrl, setIsLoggedIn, getUserData } = useContext(AppContent);
-  // console.log(backendUrl, isLoggedIn, setEmail, setIsLoggedIn, userData, setUserData)
 
   const handleOnSubmit = async (e) => {
     try {
@@ -29,9 +28,9 @@ const LoginPage = () => {
 
         if (data.success) {
           setIsLoggedIn(true)
-          toast.success("user registation success ")
-          getUserData()
-          navigate('/')
+          toast.success("user registration success ")
+          await getUserData()
+          navigate('/emailVerification')
         } else {
           toast.error(data.message)
         }
@@ -79,6 +78,7 @@ const LoginPage = () => {
                 placeholder="Enter Your Name"
                 name="name"
                 value={name}
+                required
                 onChange={(e) => setName(e.target.value)}
                 className="w-full bg-transparent outline-none text-gray-700"
               />
@@ -93,6 +93,7 @@ const LoginPage = () => {
               placeholder="Enter Your E-mail"
               name="email"
               value={email}
+              required
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-transparent outline-none text-gray-700"
             />
@@ -106,6 +107,7 @@ const LoginPage = () => {
               placeholder="Enter Your Password"
               name="password"
               value={password}
+              required
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-transparent outline-none text-gray-700"
             />

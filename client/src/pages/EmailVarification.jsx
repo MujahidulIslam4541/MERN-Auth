@@ -4,13 +4,14 @@ import { AppContent } from '../context/AppContent'
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+// import { useEffect } from 'react'
 
 const EmailVerification = () => {
     const navigate = useNavigate()
     const inputRef = useRef([])
     axios.defaults.withCredentials = true;
-    const { backendUrl, isLoggedIn, getUserData, userData } = useContext(AppContent)
-
+    const { backendUrl, getUserData, userData } = useContext(AppContent)
+    // userData, isLoggedIn 
     const handleInput = (e, index) => {
         if (e.target.value.length > 0 && index < inputRef.current.length - 1) {
             inputRef.current[index + 1].focus()
@@ -54,8 +55,12 @@ const EmailVerification = () => {
     }
 
     useEffect(() => {
-        isLoggedIn && userData && userData.isAccountVerified && navigate('/')
-    }, [isLoggedIn, userData])
+
+        if (userData?.isAccountVerified) {
+            navigate('/');
+        }
+    }, [userData]);
+
 
     return (
         <div className="bg-[url('/bg_img.png')] bg-cover bg-center min-h-screen relative">

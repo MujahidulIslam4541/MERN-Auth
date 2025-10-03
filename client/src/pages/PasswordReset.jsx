@@ -119,8 +119,9 @@ const PasswordReset = () => {
               placeholder="Enter Your E-mail"
               name="email"
               value={email}
+              required
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-transparent outline-none text-gray-700 " required
+              className="w-full bg-transparent outline-none text-gray-700 " 
             />
           </div>
 
@@ -151,6 +152,7 @@ const PasswordReset = () => {
                   key={index}
                   type="text"
                   maxLength={1}
+                  required
                   className="w-12 h-12 text-center text-gray-900 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   ref={event => inputRef.current[index] = event}
                   onInput={(e) => handleInput(e, index)}
@@ -190,6 +192,7 @@ const PasswordReset = () => {
                   placeholder="Enter Your New Password"
                   name="password"
                   value={newPassword}
+                  required
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full bg-transparent outline-none text-gray-700"
                 />
