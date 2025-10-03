@@ -24,7 +24,6 @@ export const getTodoById = async (toDoId, userId) => {
   });
 };
 
-
 // update todo by id
 export const updateTodo = async (todoId, userId, data) => {
   // Step 1: find todo by id
@@ -48,5 +47,21 @@ export const updateTodo = async (todoId, userId, data) => {
   // Step 5: save updated todo
   await todo.save();
 
+  return todo;
+};
+
+// delete todo
+export const deleteTodo = async (todoId, userId) => {
+  const todo = await ToDoModel.findById(todoId);
+  if (!todo || todo.isDeleted) {
+    return null;
+  }
+
+  if (todo.user.toString() !== userId.toString()) {
+    return null;
+  }
+
+  todo.isDeleted = true;
+  await todo.save();
   return todo;
 };

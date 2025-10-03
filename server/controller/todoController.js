@@ -1,5 +1,6 @@
 import {
   createTodo,
+  deleteTodo,
   getTodoById,
   getTodosByUser,
   updateTodo,
@@ -75,5 +76,28 @@ export const updateTodoController = async (req, res) => {
   } catch (error) {
     console.error("Update Todo Error:", error);
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// delete todo
+export const deleteTodoController = async (req, res) => {
+  try {
+    const deleteToDo = await deleteTodo(req.params.id, req.user.id);
+    if (!deleteToDo) {
+      return res.status(400).json({
+        success: false,
+        message: "To do not Found",
+      });
+    }
+    res.json({
+      success: true,
+      message: "Todo deleted successfully",
+      data: deleteToDo,
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      message: error.message,
+    });
   }
 };
