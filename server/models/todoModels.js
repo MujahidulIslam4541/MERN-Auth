@@ -26,6 +26,6 @@ const toDoSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const ToDoModel = mongoose.model("ToDo", toDoSchema);
+const ToDoModel = mongoose.model.todo || mongoose.model("ToDo", toDoSchema);
 
 export default ToDoModel;

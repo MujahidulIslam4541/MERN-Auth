@@ -2,6 +2,7 @@ import {
   createTodo,
   getTodoById,
   getTodosByUser,
+  updateTodo,
 } from "../services/todoService.js";
 
 export const createTodoController = async (req, res) => {
@@ -55,6 +56,24 @@ export const getTodoByIdController = async (req, res) => {
     res.json({ success: true, data: todo });
   } catch (error) {
     console.log(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// update todo
+export const updateTodoController = async (req, res) => {
+  try {
+    const updatedTodo = await updateTodo(req.params.id, req.user.id, req.body);
+
+    if (!updatedTodo) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Todo not found" });
+    }
+
+    res.json({ success: true, data: updatedTodo });
+  } catch (error) {
+    console.error("Update Todo Error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
