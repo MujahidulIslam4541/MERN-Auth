@@ -14,3 +14,8 @@ export const getTodosByUser = async (userId) => {
     createdAt: -1,
   });
 };
+
+// Get Single Todo by ID
+export const getTodoById=async(toDoId,userId)=>{
+    return await ToDoModel.findOne({ _id: toDoId, user: userId, isDeleted: false });
+}
