@@ -62,7 +62,7 @@ const EmailVerification = () => {
 
 
     return (
-        <div className="bg-[url('/bg_img.png')] bg-cover bg-center min-h-screen relative">
+        <div className=" bg-cover bg-center min-h-screen relative">
 
             {/* Navbar Logo */}
             <div className="absolute top-4 left-4">
