@@ -1,43 +1,54 @@
-import React, { useState } from 'react';
-import { Check, Edit2, Trash2, Plus, Circle, CheckCircle2 } from 'lucide-react';
+import React, { useContext } from 'react';
+import { Edit2, Trash2, Plus, Circle, CheckCircle2 } from 'lucide-react';
+import toast from 'react-hot-toast'
+import axios from 'axios'
+import { AppContent } from '../../context/AppContent';
+import { useQuery } from '@tanstack/react-query'
 
 export default function Todo() {
-    const [todos, setTodos] = useState([
-        {
-            id: 1,
-            name: "Learn React",
-            description: "Practice hooks and context API",
-            completed: false,
-        },
-        {
-            id: 2,
-            name: "Complete Assignment",
-            description: "Finish MERN stack todo project",
-            completed: true,
-        },
-    ]);
+    const { backendUrl } = useContext(AppContent)
+    axios.defaults.withCredentials = true;
 
+
+    // get todo
+    const fetchTodos = async () => {
+        const res = await axios.get(backendUrl + '/api/task/todos');
+        return res.data;
+    };
+    const { data = [], refetch } = useQuery({
+        queryKey: ["todos"],
+        queryFn: fetchTodos,
+    });
+    const todos = data?.data || [];
 
     // add todo
     const handleAddTodo = async (e) => {
         e.preventDefault()
-        const data = e.target;
-        const name = data.name.value;
-        const description = data.description.value;
+        const form = e.target;
+        const name = form.name.value;
+        const description = form.description.value;
         console.log({ name, description })
+
+        const { data } = await axios.post(backendUrl + '/api/task/createTodo', { name, description })
+        if (data.success) {
+            toast.success(data.message)
+            refetch()
+        }
+        else {
+            toast.error(data.message)
+        }
     }
 
-    const toggleComplete = (id) => {
-        setTodos(todos.map(todo =>
-            todo.id === id ? { ...todo, completed: !todo.completed } : todo
-        ));
-    };
 
-    const deleteTodo = (id) => {
-        setTodos(todos.filter(todo => todo.id !== id));
-    };
+    console.log(todos)
 
     const completedCount = todos.filter(t => t.completed).length;
+
+
+
+
+
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-12 px-4">
@@ -110,7 +121,7 @@ export default function Todo() {
                                 >
                                     <div className="flex items-start gap-4">
                                         <button
-                                            onClick={() => toggleComplete(todo.id)}
+                                            // onClick={() => toggleComplete(todo.id)}
                                             className="mt-1 transition-transform hover:scale-110"
                                         >
                                             {todo.completed ? (
@@ -152,7 +163,7 @@ export default function Todo() {
                                                     Edit
                                                 </button>
                                                 <button
-                                                    onClick={() => deleteTodo(todo.id)}
+                                                    // onClick={() => deleteTodo(todo.id)}
                                                     className="flex items-center gap-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors"
                                                 >
                                                     <Trash2 className="w-4 h-4" />

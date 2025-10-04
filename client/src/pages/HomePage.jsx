@@ -2,7 +2,6 @@ import { useContext } from 'react'
 import Navbar from '../components/Navbar'
 import Todo from './todo/todo'
 import { AppContent } from '../context/AppContent'
-import { Link } from 'react-router-dom'
 
 const HomePage = () => {
   const { isLoggedIn, userData } = useContext(AppContent)
