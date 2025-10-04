@@ -27,7 +27,6 @@ export default function Todo() {
         const form = e.target;
         const name = form.name.value;
         const description = form.description.value;
-        console.log({ name, description })
 
         const { data } = await axios.post(backendUrl + '/api/task/createTodo', { name, description })
         if (data.success) {
@@ -39,6 +38,14 @@ export default function Todo() {
         }
     }
 
+    // handle delete
+    const handleDeleteTodo = async (id) => {
+        console.log(id)
+    }
+
+    const handleUpdateTodo = async (id) => {
+        console.log(id)
+    }
 
     console.log(todos)
 
@@ -158,12 +165,14 @@ export default function Todo() {
                                             </div>
 
                                             <div className="flex gap-2 mt-4">
-                                                <button className="flex items-center gap-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors">
+                                                <button
+                                                    onClick={() => handleUpdateTodo(todo._id)}
+                                                    className="flex items-center gap-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors">
                                                     <Edit2 className="w-4 h-4" />
                                                     Edit
                                                 </button>
                                                 <button
-                                                    // onClick={() => deleteTodo(todo.id)}
+                                                    onClick={() => handleDeleteTodo(todo._id)}
                                                     className="flex items-center gap-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
