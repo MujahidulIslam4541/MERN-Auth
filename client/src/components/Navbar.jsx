@@ -11,23 +11,6 @@ const Navbar = () => {
     console.log(userData)
 
 
-    // const sendVerificationOtp = async () => {
-    //     try {
-    //         axios.defaults.withCredentials = true;
-
-    //         const { data } = await axios.post(backendUrl + '/api/auth/send-verify-otp')
-    //         if (data.success) {
-    //             navigate('/emailVerification')
-    //             toast.success(data.message)
-    //         }
-    //         else {
-    //             toast.error(data.error)
-    //         }
-    //     } catch (error) {
-    //         toast.error(error.message)
-    //     }
-    // }
-
 
     const logOut = async () => {
         try {
@@ -64,16 +47,6 @@ const Navbar = () => {
                             <p className="px-4 py-1 font-semibold text-gray-800 truncate">
                                 {userData?.name}
                             </p>
-
-                            {/* Email Verification */}
-                            {/* {!userData?.isAccountVerified && (
-                                <button
-                                onClick={sendVerificationOtp}
-                                    className="w-full text-left px-4 py-1 text-sm text-blue-600 hover:bg-gray-100"
-                                >
-                                    Verify Email
-                                </button>
-                            )} */}
 
                             {/* Logout */}
                             <button

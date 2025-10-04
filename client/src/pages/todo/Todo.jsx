@@ -17,21 +17,15 @@ export default function Todo() {
         },
     ]);
 
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
 
-    const addTodo = () => {
-        if (name.trim() && description.trim()) {
-            setTodos([...todos, {
-                id: Date.now(),
-                name,
-                description,
-                completed: false
-            }]);
-            setName('');
-            setDescription('');
-        }
-    };
+    // add todo
+    const handleAddTodo = async (e) => {
+        e.preventDefault()
+        const data = e.target;
+        const name = data.name.value;
+        const description = data.description.value;
+        console.log({ name, description })
+    }
 
     const toggleComplete = (id) => {
         setTodos(todos.map(todo =>
@@ -77,28 +71,25 @@ export default function Todo() {
                             Add New Task
                         </h3>
 
-                        <div className="space-y-4">
+                        <form onSubmit={handleAddTodo} className="space-y-2">
                             <input
                                 type="text"
                                 placeholder="Task name..."
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
+                                name='name'
                                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-400 focus:outline-none transition-colors"
                             />
                             <input
                                 type="text"
                                 placeholder="Add description..."
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
+                                name='description'
                                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-400 focus:outline-none transition-colors"
                             />
                             <button
-                                onClick={addTodo}
                                 className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-xl transition-all transform hover:scale-[1.02] shadow-md hover:shadow-xl"
                             >
                                 Add Task
                             </button>
-                        </div>
+                        </form>
                     </div>
 
                     {/* Tasks Grid - Right Side */}
