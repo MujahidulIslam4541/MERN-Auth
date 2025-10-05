@@ -1,10 +1,10 @@
 import { useContext } from 'react'
 import Navbar from '../components/Navbar'
-import Todo from './todo/todo'
 import { AppContent } from '../context/AppContent'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import Todo from '../components/Todo/Todo'
 
 const HomePage = () => {
   const { isLoggedIn, userData, backendUrl } = useContext(AppContent)
