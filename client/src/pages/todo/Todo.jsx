@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Edit2, Trash2, Plus, Circle, CheckCircle2 } from 'lucide-react';
 import toast from 'react-hot-toast'
 import axios from 'axios'
@@ -9,6 +9,8 @@ export default function Todo() {
     const { backendUrl } = useContext(AppContent)
     axios.defaults.withCredentials = true;
 
+    const [selectedTodo, setSelectedTodo] = useState(null);
+    const [formData, setFormData] = useState({ name: "", description: "" });
 
     // get todo
     const fetchTodos = async () => {
@@ -39,9 +41,8 @@ export default function Todo() {
 
     // handle delete
     const handleDeleteTodo = async (id) => {
-        console.log(id)
         try {
-            const res =await axios.delete(backendUrl + `/api/task/todo/${id}`)
+            const res = await axios.delete(backendUrl + `/api/task/todo/${id}`)
             if (res.data.success) {
                 toast.success(res.data.message)
                 refetch()
@@ -51,26 +52,53 @@ export default function Todo() {
         }
     }
 
+    // open update modal
+    const handleUpdateTodo = (id) => {
+        const todo = todos.find(t => t._id === id);
+        setSelectedTodo(todo);
+        setFormData({ name: todo.name, description: todo.description || "" });
+    };
 
-    const handleUpdateTodo = async (id) => {
-        console.log(id)
-    }
+    // close modal
+    const closeModal = () => {
+        setSelectedTodo(null);
+        setFormData({ name: "", description: "" });
+    };
+
+    // handle update form submit
+    const handleSubmitUpdate = async (e) => {
+        e.preventDefault();
+
+        if (!formData.name.trim()) {
+            toast.error("Task name is required!");
+            return;
+        }
+
+        try {
+            const res = await axios.patch(
+                backendUrl + `/api/task/todo/update/${selectedTodo._id}`,
+                formData
+            );
+
+            if (res?.data?.success) {
+                toast.success("Todo updated successfully!");
+                closeModal();
+                refetch();
+            } else {
+                toast.error(res?.data?.message || "Failed to update todo!");
+            }
+        } catch (error) {
+            console.error("Update Error:", error);
+            toast.error("Something went wrong while updating!");
+        }
+    };
 
     // isComplete
     const handleIsComplete = async (id) => {
         console.log(id)
     }
 
-
-    console.log(todos)
-
     const completedCount = todos.filter(t => t.completed).length;
-
-
-
-
-
-
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-12 px-4">
@@ -202,6 +230,51 @@ export default function Todo() {
                     </div>
                 </div>
             </div>
+
+            {/* 🧩 Update Modal */}
+            {selectedTodo && (
+                <div className="fixed inset-0 bg-black/30 backdrop-blur flex justify-center items-center z-50">
+                    <div className="bg-white rounded-xl shadow-lg p-6 w-[400px]">
+                        <h3 className="text-xl font-bold mb-4 text-center text-gray-800">
+                            Update Task
+                        </h3>
+                        <form onSubmit={handleSubmitUpdate} className="space-y-3">
+                            <input
+                                type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                placeholder="Task name..."
+                                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-400 focus:outline-none transition-colors"
+                            />
+                            <input
+                                type="text"
+                                name="description"
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                placeholder="Add description..."
+                                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-400 focus:outline-none transition-colors"
+                            />
+
+                            <div className="flex gap-2 pt-2">
+                                <button
+                                    type="button"
+                                    onClick={closeModal}
+                                    className="w-1/2 bg-gray-300 text-gray-800 font-semibold py-3 rounded-xl hover:bg-gray-400 transition-all"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="w-1/2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold py-3 rounded-xl transition-all shadow-md"
+                                >
+                                    Update Task
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
