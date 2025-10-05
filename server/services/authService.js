@@ -97,32 +97,32 @@ export const loginService = async ({ email, password }) => {
 };
 
 // ==================== SEND VERIFY OTP SERVICE ====================
-// export const sendVerifyOtpService = async (userId) => {
-//   // Find user by ID
-//   const user = await UserModel.findById(userId);
-//   if (!user) throw new Error("User not found");
-//   if (user.isAccountVerified) throw new Error("User already verified");
+export const sendVerifyOtpService = async (userId) => {
+  // Find user by ID
+  const user = await UserModel.findById(userId);
+  if (!user) throw new Error("User not found");
+  if (user.isAccountVerified) throw new Error("User already verified");
 
-//   // Generate OTP
-//   const otp = String(Math.floor(100000 + Math.random() * 900000));
-//   user.verifyOTP = otp;
-//   user.verifyOTPExpireAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
-//   await user.save();
+  // Generate OTP
+  const otp = String(Math.floor(100000 + Math.random() * 900000));
+  user.verifyOTP = otp;
+  user.verifyOTPExpireAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
+  await user.save();
 
-//   // Send OTP via email
-//   const mailOptions = {
-//     from: process.env.SENDER_EMAIL,
-//     to: user.email,
-//     subject: "Account Verification OTP",
-//     html: EMAIL_VERIFY_TEMPLATE.replace("{{otp}}", otp).replace(
-//       "{{email}}",
-//       user.email
-//     ),
-//   };
+  // Send OTP via email
+  const mailOptions = {
+    from: process.env.SENDER_EMAIL,
+    to: user.email,
+    subject: "Account Verification OTP",
+    html: EMAIL_VERIFY_TEMPLATE.replace("{{otp}}", otp).replace(
+      "{{email}}",
+      user.email
+    ),
+  };
 
-//   await transporter.sendMail(mailOptions);
-//   return true;
-// };
+  await transporter.sendMail(mailOptions);
+  return true;
+};
 
 // ==================== VERIFY EMAIL SERVICE ====================
 export const verifyEmailService = async (userId, otp) => {

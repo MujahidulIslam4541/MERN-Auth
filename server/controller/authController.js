@@ -380,6 +380,7 @@ import {
   verifyEmailService,
   resetPasswordOtpService,
   resetPasswordService,
+  sendVerifyOtpService,
 } from "../services/authService.js";
 
 // // ==================== REGISTER ====================
@@ -468,14 +469,14 @@ export const logOut = async (req, res) => {
 };
 
 // ==================== SEND VERIFY OTP ====================
-// export const sendVerifyOtp = async (req, res) => {
-//   try {
-//     await sendVerifyOtpService(req.user.id);
-//     res.json({ success: true, message: "Verification OTP sent" });
-//   } catch (error) {
-//     res.json({ success: false, message: error.message });
-//   }
-// };
+export const sendVerifyOtp = async (req, res) => {
+  try {
+    await sendVerifyOtpService(req.user.id);
+    res.json({ success: true, message: "Verification OTP sent" });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
 
 // ==================== VERIFY EMAIL ====================
 export const verifyEmail = async (req, res) => {
