@@ -27,7 +27,6 @@ export default function Todo() {
         const form = e.target;
         const name = form.name.value;
         const description = form.description.value;
-
         const { data } = await axios.post(backendUrl + '/api/task/createTodo', { name, description })
         if (data.success) {
             toast.success(data.message)
@@ -41,11 +40,27 @@ export default function Todo() {
     // handle delete
     const handleDeleteTodo = async (id) => {
         console.log(id)
+        try {
+            const res =await axios.delete(backendUrl + `/api/task/todo/${id}`)
+            if (res.data.success) {
+                toast.success(res.data.message)
+                refetch()
+            }
+        } catch (error) {
+            console.log(error.message)
+        }
     }
+
 
     const handleUpdateTodo = async (id) => {
         console.log(id)
     }
+
+    // isComplete
+    const handleIsComplete = async (id) => {
+        console.log(id)
+    }
+
 
     console.log(todos)
 
@@ -122,13 +137,13 @@ export default function Todo() {
                         ) : (
                             todos.map((todo) => (
                                 <div
-                                    key={todo.id}
+                                    key={todo._id}
                                     className={`bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border-l-4 ${todo.completed ? 'border-green-400 bg-green-50/30' : 'border-indigo-400'
                                         }`}
                                 >
                                     <div className="flex items-start gap-4">
                                         <button
-                                            // onClick={() => toggleComplete(todo.id)}
+                                            onClick={() => handleIsComplete(todo._id)}
                                             className="mt-1 transition-transform hover:scale-110"
                                         >
                                             {todo.completed ? (
