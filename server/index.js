@@ -31,6 +31,10 @@ app.get("/", (req, res) => {
   res.send("hello world");
 });
 
+app.get("/api", (req, res) => {
+  res.send("Server running fine ✅");
+});
+
 // Import and use auth routes
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
