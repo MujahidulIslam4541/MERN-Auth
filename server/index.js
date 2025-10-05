@@ -13,7 +13,15 @@ const app = express();
 // Middleware
 app.use(express.json()); // use express.json() for parsing JSON
 app.use(cookieParser());
-app.use(cors({ credentials: true, origin: "http://localhost:5173" })); // replace origin with your frontend URL
+app.use(
+  cors({
+    credentials: true,
+    origin: [
+      "http://localhost:5173",
+      "https://client-eight-sand-98.vercel.app",
+    ],
+  })
+); // replace origin with your frontend URL
 
 // Database connection
 connectDB();
@@ -26,7 +34,7 @@ app.get("/", (req, res) => {
 // Import and use auth routes
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
-app.use('/api/task',todoRoute)
+app.use("/api/task", todoRoute);
 
 // Start server
 app.listen(PORT, () => {
