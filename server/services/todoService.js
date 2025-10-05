@@ -9,11 +9,23 @@ export const createTodo = async (userId, data) => {
   return todo;
 };
 
-export const getTodosByUser = async (userId) => {
-  return await ToDoModel.find({ user: userId, isDeleted: false }).sort({
-    createdAt: -1,
-  });
+export const getTodosByUserPaginated = async (userId, page = 1, limit) => {
+  const skip = (page - 1) * limit;
+  const todos = await ToDoModel.find({ user: userId, isDeleted: false })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await ToDoModel.countDocuments({ user: userId, isDeleted: false });
+
+  return {
+    todos,
+    total,
+    page,
+    pages: Math.ceil(total / limit),
+  };
 };
+
 
 // Get Single Todo by ID
 export const getTodoById = async (toDoId, userId) => {

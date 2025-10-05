@@ -2,7 +2,7 @@ import {
   createTodo,
   deleteTodo,
   getTodoById,
-  getTodosByUser,
+  getTodosByUserPaginated,
   updateTodo,
 } from "../services/todoService.js";
 
@@ -30,16 +30,20 @@ export const createTodoController = async (req, res) => {
   }
 };
 
-export const getTodosByUserController = async (req, res) => {
+export const getTodosByUserPaginatedController = async (req, res) => {
   try {
     const userId = req.user.id;
-    const todos = await getTodosByUser(userId);
+    const page = parseInt(req.query.page) || 1;
+    // const limit = 0;
+    const limit = parseInt(req.query.limit) || 0;
 
-    res.json({ success: true, data: todos });
+    const result = await getTodosByUserPaginated(userId, page, limit);
+
+    res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({
-      status: 500,
-      message: "server error",
+      success: false,
+      message: "Server error",
     });
   }
 };
