@@ -2,10 +2,26 @@ import { useContext } from 'react'
 import Navbar from '../components/Navbar'
 import Todo from './todo/todo'
 import { AppContent } from '../context/AppContent'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import toast from 'react-hot-toast'
 
 const HomePage = () => {
-  const { isLoggedIn, userData } = useContext(AppContent)
-  console.log(isLoggedIn, userData.isVerified)
+  const { isLoggedIn, userData, backendUrl } = useContext(AppContent)
+  const navigate = useNavigate()
+  axios.defaults.withCredentials = true;
+
+  const sendVerificationOtp = async () => {
+    const res = await axios.post(backendUrl + '/api/auth/send-verify-otp')
+    if (res.data.success) {
+      navigate('/emailVerification')
+      toast.success(res.data.message)
+    }
+  }
+
+
+
+
   return (
     <div className=" bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
       <Navbar />
@@ -41,7 +57,7 @@ const HomePage = () => {
               </p>
               <p className="text-lg text-indigo-600 font-semibold">
                 {isLoggedIn
-                  ? "Please verify your account to start managing your todos!"
+                  ? <button onClick={sendVerificationOtp}><Link>Please verify your account to start managing your todos!</Link></button>
                   : "Login now and start organizing your tasks!"}
               </p>
             </div>
