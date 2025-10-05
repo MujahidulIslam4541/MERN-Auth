@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react';
-import { Edit2, Trash2, Plus, Circle, CheckCircle2 } from 'lucide-react';
+import { useContext, useState } from 'react';
+import { Edit2, Trash2, Plus, Circle, CheckCircle2, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import { AppContent } from '../../context/AppContent';
@@ -11,6 +11,7 @@ export default function Todo() {
 
     const [selectedTodo, setSelectedTodo] = useState(null);
     const [formData, setFormData] = useState({ name: "", description: "" });
+    const [deleteConfirm, setDeleteConfirm] = useState(null); // for delete modal
 
     // get todo
     const fetchTodos = async () => {
@@ -33,6 +34,7 @@ export default function Todo() {
         if (data.success) {
             toast.success(data.message)
             refetch()
+            form.reset()
         }
         else {
             toast.error(data.message)
@@ -46,11 +48,23 @@ export default function Todo() {
             if (res.data.success) {
                 toast.success(res.data.message)
                 refetch()
+                setDeleteConfirm(null) // close modal
             }
         } catch (error) {
             console.log(error.message)
+            toast.error("Failed to delete task")
         }
     }
+
+    // open delete confirmation modal
+    const openDeleteModal = (todo) => {
+        setDeleteConfirm(todo);
+    };
+
+    // close delete modal
+    const closeDeleteModal = () => {
+        setDeleteConfirm(null);
+    };
 
     // open update modal
     const handleUpdateTodo = (id) => {
@@ -94,11 +108,26 @@ export default function Todo() {
     };
 
     // isComplete
-    const handleIsComplete = async (id) => {
-        console.log(id)
+    const handleIsComplete = async (id, completed) => {
+        console.log(id,completed)
+        try {
+            const res = await axios.patch(backendUrl + `/api/task/todo/update/${id}`, {
+                isComplete: !completed  // toggle true/false
+            });
+
+            if (res.data.success) {
+                toast.success("Status updated!");
+                refetch(); // UI refresh
+            } else {
+                toast.error(res.data.message || "Failed to update status");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Something went wrong!");
+        }
     }
 
-    const completedCount = todos.filter(t => t.completed).length;
+    const completedCount = todos.filter(t => t.isComplete).length;
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-12 px-4">
@@ -166,15 +195,15 @@ export default function Todo() {
                             todos.map((todo) => (
                                 <div
                                     key={todo._id}
-                                    className={`bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border-l-4 ${todo.completed ? 'border-green-400 bg-green-50/30' : 'border-indigo-400'
+                                    className={`bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border-l-4 ${todo.isComplete ? 'border-green-400 bg-green-50/30' : 'border-indigo-400'
                                         }`}
                                 >
                                     <div className="flex items-start gap-4">
                                         <button
-                                            onClick={() => handleIsComplete(todo._id)}
+                                            onClick={() => handleIsComplete(todo._id, todo.isComplete)}
                                             className="mt-1 transition-transform hover:scale-110"
                                         >
-                                            {todo.completed ? (
+                                            {todo.isComplete ? (
                                                 <CheckCircle2 className="w-6 h-6 text-green-500" />
                                             ) : (
                                                 <Circle className="w-6 h-6 text-gray-300 hover:text-indigo-400" />
@@ -184,18 +213,18 @@ export default function Todo() {
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between gap-4">
                                                 <div className="flex-1">
-                                                    <h4 className={`text-lg font-semibold mb-1 ${todo.completed ? 'line-through text-gray-400' : 'text-gray-800'
+                                                    <h4 className={`text-lg font-semibold mb-1 ${todo.isComplete ? 'line-through text-gray-400' : 'text-gray-800'
                                                         }`}>
                                                         {todo.name}
                                                     </h4>
-                                                    <p className={`text-sm ${todo.completed ? 'line-through text-gray-400' : 'text-gray-600'
+                                                    <p className={`text-sm ${todo.isComplete ? 'line-through text-gray-400' : 'text-gray-600'
                                                         }`}>
                                                         {todo.description}
                                                     </p>
                                                 </div>
 
                                                 <div className="flex items-center gap-2">
-                                                    {todo.completed ? (
+                                                    {todo.isComplete ? (
                                                         <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
                                                             Done
                                                         </span>
@@ -215,7 +244,7 @@ export default function Todo() {
                                                     Edit
                                                 </button>
                                                 <button
-                                                    onClick={() => handleDeleteTodo(todo._id)}
+                                                    onClick={() => openDeleteModal(todo)}
                                                     className="flex items-center gap-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
@@ -231,7 +260,7 @@ export default function Todo() {
                 </div>
             </div>
 
-            {/* 🧩 Update Modal */}
+            {/* Update Modal */}
             {selectedTodo && (
                 <div className="fixed inset-0 bg-black/30 backdrop-blur flex justify-center items-center z-50">
                     <div className="bg-white rounded-xl shadow-lg p-6 w-[400px]">
@@ -272,6 +301,43 @@ export default function Todo() {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {deleteConfirm && (
+                <div className="fixed inset-0 bg-black/40 backdrop-blur flex justify-center items-center z-50">
+                    <div className="bg-white rounded-2xl shadow-2xl p-6 w-[400px] border-2 border-red-100">
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                                <AlertTriangle className="w-8 h-8 text-red-500" />
+                            </div>
+                            <h3 className="text-2xl font-bold mb-2 text-gray-800">
+                                Are you sure?
+                            </h3>
+                            <p className="text-gray-600 mb-2">
+                                Do you really want to delete this task?
+                            </p>
+                            <p className="text-sm font-semibold text-gray-700 mb-6">
+                                "{deleteConfirm.name}"
+                            </p>
+
+                            <div className="flex gap-3 w-full">
+                                <button
+                                    onClick={closeDeleteModal}
+                                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 rounded-xl transition-all"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => handleDeleteTodo(deleteConfirm._id)}
+                                    className="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-xl transition-all shadow-md hover:shadow-lg"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
