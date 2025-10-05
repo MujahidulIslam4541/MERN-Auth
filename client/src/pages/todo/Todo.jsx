@@ -160,14 +160,39 @@ export default function Todo() {
                             </div>
                         ))}
 
-                        {/* Pagination */}
+                        {/* ================== PAGINATION ================== */}
                         {totalPages > 1 && (
-                            <div className="flex justify-center items-center gap-3 mt-6">
-                                <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1} className="flex items-center gap-1 px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"><ChevronLeft className="w-4 h-4" /> Prev</button>
-                                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                                    <button key={page} onClick={() => goToPage(page)} className={`px-4 py-2 rounded-lg ${currentPage === page ? 'bg-indigo-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>{page}</button>
-                                ))}
-                                <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages} className="flex items-center gap-1 px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50">Next <ChevronRight className="w-4 h-4" /></button>
+                            <div className="flex justify-center items-center gap-2 mt-6">
+                                <button
+                                    onClick={() => goToPage(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="flex items-center gap-1 px-3 py-1.5 bg-white border-2 border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50 rounded-full disabled:opacity-40 disabled:cursor-not-allowed text-gray-700 text-sm font-medium transition-all shadow-sm"
+                                >
+                                    <ChevronLeft className="w-3.5 h-3.5" /> Prev
+                                </button>
+
+                                <div className="flex items-center gap-1.5">
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                        <button
+                                            key={page}
+                                            onClick={() => goToPage(page)}
+                                            className={`min-w-[32px] h-8 rounded-full text-sm font-semibold transition-all ${currentPage === page
+                                                    ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md scale-110'
+                                                    : 'bg-white border-2 border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 text-gray-700'
+                                                }`}
+                                        >
+                                            {page}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <button
+                                    onClick={() => goToPage(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className="flex items-center gap-1 px-3 py-1.5 bg-white border-2 border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50 rounded-full disabled:opacity-40 disabled:cursor-not-allowed text-gray-700 text-sm font-medium transition-all shadow-sm"
+                                >
+                                    Next <ChevronRight className="w-3.5 h-3.5" />
+                                </button>
                             </div>
                         )}
                     </div>
