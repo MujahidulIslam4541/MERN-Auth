@@ -618,7 +618,7 @@ in the Software without restriction...
 
 **Your Name** - [@yourtwitter](https://twitter.com/yourtwitter)
 
-**Project Link**: [https://github.com/yourusername/mern-auth-todo](https://github.com/yourusername/mern-auth-todo)
+**Project Link**:https://github.com/MujahidulIslam4541/MERN-Auth
 
 **Live Demo**: [https://your-app.vercel.app](https://your-app.vercel.app)
 
