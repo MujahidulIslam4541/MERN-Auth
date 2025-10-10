@@ -9,7 +9,8 @@
 
 **A modern, secure, and scalable full-stack application featuring JWT authentication, email verification, and todo management.**
 
-[Live Demo](#) • [Report Bug](#) • [Request Feature](#)
+[Live Demo] client-eight-sand-98.vercel.app
+[Report Bug](#) • [Request Feature](#)
 
 </div>
 
@@ -620,7 +621,7 @@ in the Software without restriction...
 
 **Project Link**:https://github.com/MujahidulIslam4541/MERN-Auth
 
-**Live Demo**: [https://your-app.vercel.app](https://your-app.vercel.app)
+**Live Demo**: [)client-eight-sand-98.vercel.app
 
 ---
 
